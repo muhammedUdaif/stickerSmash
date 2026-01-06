@@ -3,12 +3,16 @@ import React from 'react'
 import { Image } from 'expo-image'
 
 type Props = {
-    imgSource: ImageSourcePropType
+    imgSource: ImageSourcePropType;
+    selectedImage?: string;
 }
 
-const ImageViewer = ({imgSource}: Props) => {
+const ImageViewer = ({imgSource, selectedImage}: Props) => {
+  
+  const imageSource = selectedImage ? {uri: selectedImage} : imgSource;
+
   return (
-    <Image source={imgSource} style={styles.image}/>
+    <Image source={imageSource} style={styles.image}/>
   )
 }
 

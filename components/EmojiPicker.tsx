@@ -7,10 +7,10 @@ type Props = PropsWithChildren<{
     onClose: () => void;
 }>;
 
-const emojiPicker = ({ isVisible, onClose, children}: Props) => {
+const EmojiPicker = ({ isVisible, onClose, children}: Props) => {
   return (
     <View >
-      <Modal animationType='slide' transparent={true} visible={isVisible} />
+      <Modal animationType='slide' transparent={true} visible={isVisible}>
       <View style={styles.modalContent}>
         <View style={styles.tittleContainer}>
             <Text style={styles.tittle}>Choose a Sticker</Text>
@@ -20,11 +20,12 @@ const emojiPicker = ({ isVisible, onClose, children}: Props) => {
         </View>
         {children}
       </View>
+      </Modal>
     </View>
   )
 }
 
-export default emojiPicker
+export default EmojiPicker
 
 
 const styles = StyleSheet.create({

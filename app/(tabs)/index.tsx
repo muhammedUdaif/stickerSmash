@@ -1,17 +1,34 @@
 import Button from "@/components/Button";
 import ImageViewer from "@/components/ImageViewer";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
-import { View, StyleSheet} from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { View, StyleSheet, ImageSourcePropType} from "react-native";
 import IconButton from "@/components/IconButton";
+import EmojiList from "@/components/EmojiList";
+import EmojiPicker from "@/components/EmojiPicker";
+import EmojiSticker from "@/components/EmojiSticker";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import CircleButton from "@/components/CircleButton";
+import * as MediaLibrary from "expo-media-library"
+import { captureRef } from "react-native-view-shot";
 
 const placeholderImage = require('@/assets/images/background-image.png');
 
 export default function Index() {
+
+  const imageRef = useRef<View>(null);
   
+  const [permissionResponse, requestPermission] = MediaLibrary.usePermissions();
   const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
   const [showAppOptions, setShowAppOptions] = useState<boolean>(false);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [pickedEmoji, setPickedEmoji] = useState<ImageSourcePropType | undefined>(undefined);
+
+  useEffect(() => {
+    if(!permissionResponse?.granted) {
+      requestPermission();
+    }
+  }, []);
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -29,20 +46,27 @@ export default function Index() {
   };
 
   const onReset = () => {
-     setShowAppOptions(false);
+    setShowAppOptions(false);
   }
 
   const onAddSticker = () => {
+    setIsModalVisible(true);
+  }
 
+  const onModalClose = () => {
+    setIsModalVisible(false);
   }
 
   const onSaveImageAsync = async () => {
 
   }
   return (
-    <View style={styles.container}>
-      <View style={styles.imagecontainer}>
-        <ImageViewer imgSource={placeholderImage} selectedImage={selectedImage}/>
+    <GestureHandlerRootView style={styles.container} >
+      <View  style={styles.imagecontainer}>
+        <View ref={imageRef} collapsable={false}>
+            <ImageViewer imgSource={placeholderImage} selectedImage={selectedImage}/>
+            {pickedEmoji && <EmojiSticker imageSize={40} stickerSource={pickedEmoji}/>}
+        </View>
       </View>
       {showAppOptions ? (
         <View style={styles.optionContainer}>
@@ -58,7 +82,10 @@ export default function Index() {
         <Button label="Use this photo" onPress={() => setShowAppOptions(true)}/>
       </View>
       )}
-    </View>
+      <EmojiPicker isVisible={isModalVisible} onClose={onModalClose}>
+         <EmojiList onSelect={setPickedEmoji} onCloseModal={onModalClose} />
+      </EmojiPicker>
+    </GestureHandlerRootView>
   );
 }
 
